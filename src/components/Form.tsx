@@ -8,7 +8,7 @@ const Form: React.FC = () => {
   const [result, setResult] = useState<number | null>(null);
 
   // Fetch exchange rate when currencies change
-  const { rates, currencyList, loading, error } = useFetch(fromCurrency,toCurrency);
+  const { rates, currencyList, loading, error } = useFetch(fromCurrency, toCurrency);
 
   const options = currencyList;
 
@@ -19,9 +19,16 @@ const Form: React.FC = () => {
     if (error) {
       console.error('Error fetching currency rate');
     }
-  }, [loading, error,toCurrency,fromCurrency]);
+  }, [loading, error, toCurrency, fromCurrency,amount]);
 
   // Handle conversion logic
+ 
+  useEffect(() => {
+    if (amount > 0) {
+      handleConvert();
+    }
+  }, [amount, fromCurrency, toCurrency, rates]);
+  
   const handleConvert = () => {
     // Ensure the amount is a valid number
     if (isNaN(amount) || amount <= 0) {
@@ -98,24 +105,26 @@ const Form: React.FC = () => {
         </div>
 
         {/* Convert Button */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-between items-center w-full mt-4">
+          {/* Button on the Right */}
           <button
             onClick={handleConvert}
-            className="w-full sm:w-1/4 bg-blue-900 text-white font-semibold p-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-blue-900 text-white font-semibold p-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Convert
           </button>
-        </div>
+          {/* Display Result on the Left */}
+          {result !== null && (
+            <div className="text-lg font-semibold text-gray-700">
+              <p>
+                {amount} {fromCurrency.toUpperCase()} ={' '}
+                {result.toFixed(2)} {toCurrency.toUpperCase()}
+              </p>
+            </div>
+          )}
 
-        {/* Display Result */}
-        {result !== null && (
-          <div className="mt-4 text-center">
-            <p className="text-lg font-semibold text-gray-700">
-              {amount} {fromCurrency.toUpperCase()} ={' '}
-              {result.toFixed(2)} {toCurrency.toUpperCase()}
-            </p>
-          </div>
-        )}
+
+        </div>
       </div>
     </div>
   );
